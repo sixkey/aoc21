@@ -19,12 +19,12 @@ let rec stdin_fold tran start stdin = match In_channel.input_line stdin with
     |   Some line -> stdin_fold tran (tran start line) stdin
     |   None -> start
 
-let parse_line line = List.map ~f:(fun x -> Char.to_int x |> fun x -> if x = 49 then 1 else 0) (String.to_list line) 
+let to_dec = List.fold ~f:(fun a v -> a * 2 + v) ~init:0 
+let inverse = List.map ~f:(fun v -> if v = 0 then 1 else 0)
 
 let print_int_list l = List.iter ~f:(fun x -> Caml.print_int x; Caml.print_char ' ') l; Caml.print_char '\n';;
 
-let to_dec = List.fold ~f:(fun a v -> a * 2 + v) ~init:0 
-let inverse = List.map ~f: (fun v -> if v = 0 then 1 else 0)
+let parse_line l = String.to_list l |> List.map ~f:((fun x -> if x = 49 then 1 else 0) % Char.to_int) 
 
 let count = List.map2_exn ~f:(fun a b -> a + (if b = 1 then 1 else -1))
 let to_bin = List.map ~f:(fun v -> if v >= 0 then 1 else 0)
