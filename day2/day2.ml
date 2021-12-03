@@ -14,11 +14,11 @@ let parse_line line = match String.split_on_char(' ') line with
     | dir::loc::_ -> dir, int_of_string loc
     | _ -> "", 0
 
-let move (pos, depth) (dir, loc) =
+let move (pos, depth) (dir, x) =
     match dir with 
-    |   "forward" -> pos + loc, depth
-    |   "up" -> pos, depth - loc
-    |   "down" -> pos, depth + loc
+    |   "forward" -> pos + x, depth
+    |   "up" -> pos, depth - x
+    |   "down" -> pos, depth + x
     |   _ -> pos, depth
 
 let move2 (pos, depth, aim) (dir, x) =
