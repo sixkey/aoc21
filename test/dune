@@ -1,2 +1,3 @@
 (executable
+ (libraries base stdio kock)
  (name helloworld))
