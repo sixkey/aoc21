@@ -64,7 +64,6 @@ let fill_row y puzzle v = List.mapi (int_line ' ' v) ~f:(fun i v -> puzzle#m.(y)
                        fun x (v, b) -> ma.(y).(x) <- (v, b || v = value)) r)
                                                end;;
 
-
    let check_col matrix x = List.map ~f:(fun y -> snd matrix#m.(y).(x)) (0 -- matrix#h) |> l_all
    let check_row matrix y = List.map ~f:(fun x -> snd matrix#m.(y).(x)) (0 -- matrix#w) |> l_all
      let check_cols matrix = List.map ~f:(fun x -> check_col matrix x) (0 -- matrix#w) |> l_or
