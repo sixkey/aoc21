@@ -24,7 +24,7 @@ let trd (_, _, c) = c
 
 let (--) (a : int) (b : int) = List.init (b - a) ~f:(fun x -> x + a)
 let (---) ((ax, ay) : int * int) ((bx, by) : int * int) = 
-    List.concat @@ List.init (ay - ax) ~f:(fun a -> List.init (by - bx) ~f:(fun b -> (a, b)))
+    List.concat @@ List.init (ay - ax) ~f:(fun a -> List.init (by - bx) ~f:(fun b -> (ax + a, bx + b)))
 
 (* Lists *)
 
@@ -53,14 +53,20 @@ module IO = struct
                 |   Some line -> stdin_foldi_step (tran i acc line) (m - 1) (i + 1)
                 |   None -> acc
             in stdin_foldi_step start max_lines 0
-    let stdin_foldi = stdin_foldim (-1) 
+    let stdin_foldi tran = stdin_foldim (-1) tran 
     let stdin_foldm max_lines tran = stdin_foldim max_lines (fun _ acc v -> tran acc v) 
-    let stdin_fold = stdin_foldm (-1)
+    let stdin_fold tran = stdin_foldm (-1) tran 
 
     let stdin_mapim max_lines tran = stdin_foldim max_lines (fun i acc value -> tran i value :: acc) []
-    let stdin_mapi = stdin_mapim (-1)
+    let stdin_mapi tran = stdin_mapim (-1) tran
     let stdin_mapm max_lines tran = stdin_mapim max_lines (fun _ value -> tran value) 
     let stdin_map = stdin_mapm (-1)
+
+    let stdin_filter_map tran = stdin_fold (fun acc value -> 
+        match tran value with 
+            | Some res -> res :: acc
+            | None -> acc 
+    ) []
 
     let stdin_lst = stdin_map id
 
