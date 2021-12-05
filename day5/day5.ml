@@ -88,7 +88,7 @@ let parse_input filename =
     In_channel.create filename
     |> IO.stdin_filter_map Line2D.parse 
 
-let line_in_matrix lines = 
+let lines_in_matrix lines = 
     List.fold ~f:(fun r l -> Rect2D.expand (Line l) r) ~init:(Rect2D.of_tuple (0, 0, 0, 0)) lines
     |> fun rect -> 
         let m = Matrix.make (rect.r - rect.l + 1) (rect.b - rect.t + 1) 0
@@ -97,14 +97,14 @@ let line_in_matrix lines =
 let part1 filename = 
     parse_input filename
     |> List.filter ~f:(fun Line2D.{a; b} -> a.x = b.x || a.y = b.y) 
-    |> line_in_matrix
+    |> lines_in_matrix
     |> Matrix.to_listi 
     |> List.count ~f:(fun (_, _, v) -> v >= 2) 
     |> printf "%d\n"
 
 let part2 filename = 
     parse_input filename
-    |> line_in_matrix
+    |> lines_in_matrix
     |> Matrix.to_listi 
     |> List.count ~f:(fun (_, _, v) -> v >= 2) 
     |> printf "%d\n"
