@@ -4,7 +4,7 @@ open Kock;;
 
 let start = [0];; 
 
-let fish_tank = Array.init 9 ~f:(fun _ -> 0)
+let fish_tank () = Array.init 9 ~f:(fun _ -> 0)
 
 let fill_tank (tank : int array) (fishes : int list) = 
     List.iter ~f:(fun f -> tank.(f) <- tank.(f) + 1) fishes; 
@@ -19,11 +19,10 @@ let step_fish (f : int) : int list = match f with
 
 let fishes (tank : int array) (n: int) : int list = 
     let rec fish_step (tank : int array) (lst : int list) = 
-    IO.print_int_array tank;
     function 
         | 0 -> (tank, lst)
         | n -> 
-            let res_tank = Array.init 9 ~f:(fun _ -> 0) in 
+            let res_tank = fish_tank () in 
             for i = 0 to 8 do 
                 List.iter ~f:(fun v -> 
                     res_tank.(v) <- res_tank.(v) + tank.(i)) (step_fish i)
@@ -35,10 +34,20 @@ let parse_input filename =
     In_channel.create filename 
     |> IO.stdin_map (IO.int_line ',') 
     |> List.hd_exn 
-    |> fill_tank fish_tank
+    |> fill_tank @@ fish_tank ()
 
-let () =
-    parse_input "day6/input.txt"
+let part1 filename =  
+    parse_input filename
+    |> (fun tank -> fishes tank 80)
+    |> List.hd_exn
+    |> printf "%d\n"
+
+let part2 filename =  
+    parse_input filename
     |> (fun tank -> fishes tank 256)
     |> List.hd_exn
     |> printf "%d\n"
+
+let () =
+    let filename = "day6/input.txt" in 
+    part1 filename; part2 filename
