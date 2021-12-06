@@ -60,7 +60,7 @@ module IO = struct
     let stdin_mapim max_lines tran = stdin_foldim max_lines (fun i acc value -> tran i value :: acc) []
     let stdin_mapi tran = stdin_mapim (-1) tran
     let stdin_mapm max_lines tran = stdin_mapim max_lines (fun _ value -> tran value) 
-    let stdin_map = stdin_mapm (-1)
+    let stdin_map (tran : 'a -> 'b) = stdin_mapm (-1) tran
 
     let stdin_filter_map tran = stdin_fold (fun acc value -> 
         match tran value with 
@@ -71,6 +71,8 @@ module IO = struct
     let stdin_lst = stdin_map id
 
     let print_int_list lst = List.iter ~f:(printf "%d, ") lst; printf "\n"
+    let print_int_array arr = Array.iter ~f:(printf "%d, ") arr; printf "\n"
+
     let print_string_list lst = List.iter ~f:(printf "%s, ") lst; printf "\n"
 
     let int_line s line = String.split_on_chars ~on:[s] line |> 
