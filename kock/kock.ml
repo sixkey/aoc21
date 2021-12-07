@@ -33,12 +33,19 @@ module Lst = struct
     let l_all (lst : bool list) = List.fold lst ~init:true ~f:(&&)
     let l_or (lst : bool list) = List.fold lst ~init:false ~f:(||)
 
-    let rec l_drop n l = match n with 
+    let rec drop n l = match n with 
     | 0 -> l 
     | n -> match l with 
     | [] -> []
-    | _::t -> l_drop (n - 1) t 
+    | _::t -> drop (n - 1) t 
 
+    let max_exn compare lst = match List.max_elt ~compare:compare lst with 
+        | Some v -> v 
+        | None -> raise (Invalid_argument "lst has to have values")
+
+    let min_exn compare lst = match List.min_elt ~compare:compare lst with 
+        | Some v -> v 
+        | None -> raise (Invalid_argument "lst has to have values")
 end 
 
 (* IO *)
