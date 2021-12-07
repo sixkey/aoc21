@@ -13,7 +13,8 @@ let part2 filename =
     |> IO.stdin_map (IO.int_line ',')
     |> List.hd_exn 
     |> (fun crabs -> 
-        List.map ~f:(fun i -> (i, fuel_for i crabs)) (0--(Lst.max_exn Int.compare crabs)))
+        List.map ~f:(
+            fun i -> (i, fuel_for i crabs)) (0--(Lst.max_exn Int.compare crabs)))
     |> Lst.min_exn (fun (_, x) (_, y) -> Int.compare x y ) 
     |> snd
     |> printf "%d\n"
