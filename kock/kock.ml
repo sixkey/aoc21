@@ -95,5 +95,25 @@ module IO = struct
 
 end
 
+module Comb = struct 
+    
+    let permutations lst = 
+        let ar = Array.of_list 
+            (List.map ~f:(fun x -> (true, x)) lst) in 
+        let add_if_empty = function [] -> [[]] | a -> a in
+        let rec perm_step ar = 
+            add_if_empty @@ List.concat @@ List.filter_map ~f:(fun i -> 
+                let f, v = ar.(i) in 
+                if not f 
+                    then None 
+                    else 
+                        (ar.(i) <- false, v; 
+                            (let res = List.map ~f:(fun xs -> v::xs) (perm_step ar) in 
+                            (ar.(i) <- true, v; 
+                            Some res)))
+            ) (0 -- Array.length ar) in
+        perm_step ar
+end
+
 let to_dec (xs : int list) : int = List.fold ~f:(fun a v -> a * 2 + v) ~init:0 xs
 let inverse (xs : int list) : int list = List.map ~f:(fun v -> if v = 0 then 1 else 0) xs
