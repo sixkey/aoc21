@@ -46,6 +46,13 @@ module Lst = struct
     let min_exn compare lst = match List.min_elt ~compare:compare lst with 
         | Some v -> v 
         | None -> raise (Invalid_argument "lst has to have values")
+
+    let print p l = printf "["; List.iter ~f:(fun x -> p x; printf ",") l; printf "]\n"
+
+    let rec zip xs ys = match xs, ys with 
+        | (xh::xt, yh::yt) -> (xh, yh) :: zip xt yt
+        | (_, _) -> []
+
 end 
 
 (* IO *)
