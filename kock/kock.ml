@@ -16,6 +16,12 @@ let fdup f g x = (f x, g x)
 let (%) f g x = f (g x)
 let flip f a b = f b a
 
+let uncurry f a b = f (a, b)
+let curry f (a, b) = f a b 
+
+let first f (a, b) = (f a, b)
+let second f (a, b) = (a, f b)
+
 (*Tuple manipulation*)
 
 let trd (_, _, c) = c
@@ -31,7 +37,9 @@ let (---) ((ax, ay) : int * int) ((bx, by) : int * int) =
 module Lst = struct 
 
     let l_all (lst : bool list) = List.fold lst ~init:true ~f:(&&)
+    let all_map (pred : 'a -> bool) (lst : 'a list) = List.fold ~f:(fun acc v -> acc && pred v) ~init:true lst
     let l_or (lst : bool list) = List.fold lst ~init:false ~f:(||)
+    let or_map (pred : 'a -> bool) (lst : 'a list) = List.fold ~f:(fun acc v -> acc || pred v) ~init:false lst
 
     let rec drop n l = match n with 
     | 0 -> l 
@@ -53,7 +61,33 @@ module Lst = struct
         | (xh::xt, yh::yt) -> (xh, yh) :: zip xt yt
         | (_, _) -> []
 
+    let min_exn comp xs = match List.min_elt ~compare:comp xs with 
+        | Some v -> v 
+        | None -> raise (Invalid_argument "the list is empty")
+
 end 
+
+module Matrix = struct
+    type 'a t = {m : 'a array array; w : int; h : int } 
+
+    let make w h v = let m = Array.make_matrix ~dimx:w ~dimy:h v in { m = m ; w = w ; h = h }
+
+    let print {m; w; h} = 
+        for y = 0 to h - 1 do 
+            for x = 0 to w - 1 do 
+                printf (if x <> 0 then ", %d" else "%d") m.(x).(y)
+            done;
+            printf "\n" 
+        done
+
+
+    let get {m; w; h} x y = if x < 0 || x >= w || y < 0 || y >= h then None else Some m.(x).(y) 
+    let get_def m x y d = match get m x y with 
+        | None -> d 
+        | Some v -> v 
+
+    let to_listi {m; w; h} = List.fold ~f:(fun acc (x, y) -> (x, y, m.(x).(y)) :: acc) ~init:[] ((0, w) --- (0, h))
+end
 
 (* IO *)
 
