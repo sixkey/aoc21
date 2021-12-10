@@ -4,14 +4,10 @@ open Kock;;
 open Base.Poly;;
 
 let get_score (a : char) : int = match a with 
-    | '(' -> 3 
-    | ')' -> 3 
-    | '[' -> 57
-    | ']' -> 57
-    | '{' -> 1197
-    | '}' -> 1197
-    | '<' -> 25137
-    | '>' -> 25137
+    | '(' | ')' -> 3 
+    | '[' | ']' -> 57
+    | '{' | '}' -> 1197
+    | '<' | '>' -> 25137
     | _ -> 0 
 
 let auto_score (a : char) : int = match a with 
@@ -22,10 +18,7 @@ let auto_score (a : char) : int = match a with
     | _ -> 0 
 
 let is_opening (a : char) : bool = match a with 
-    | '(' -> true 
-    | '[' -> true
-    | '{' -> true
-    | '<' -> true
+    | '(' |'[' | '{' | '<' -> true
     | _ -> false 
 
 let get_match (a : char) : char = match a with 
