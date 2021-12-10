@@ -3,7 +3,6 @@ open Stdio;;
 open Kock;;
 open Base.Poly;;
 
-
 let get_score (a : char) : int = match a with 
     | '(' -> 3 
     | ')' -> 3 
