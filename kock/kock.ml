@@ -72,21 +72,49 @@ module Matrix = struct
 
     let make w h v = let m = Array.make_matrix ~dimx:w ~dimy:h v in { m = m ; w = w ; h = h }
 
-    let print {m; w; h} = 
+    let print (prnt) {m; w; h} = 
         for y = 0 to h - 1 do 
             for x = 0 to w - 1 do 
-                printf (if x <> 0 then ", %d" else "%d") m.(x).(y)
+                printf (if x <> 0 then ", " else ""); prnt m.(x).(y)
             done;
             printf "\n" 
         done
 
-
     let get {m; w; h} x y = if x < 0 || x >= w || y < 0 || y >= h then None else Some m.(x).(y) 
+
     let get_def m x y d = match get m x y with 
         | None -> d 
         | Some v -> v 
 
     let to_listi {m; w; h} = List.fold ~f:(fun acc (x, y) -> (x, y, m.(x).(y)) :: acc) ~init:[] ((0, w) --- (0, h))
+
+    let apply (f : 'a -> 'a) {m; w; h} = 
+        for y = 0 to h - 1 do 
+            for x = 0 to w - 1 do 
+                m.(x).(y) <- f m.(x).(y) 
+            done
+        done;
+        {m; w; h}
+
+    let apply_fold (f : 'b -> 'a -> ('b * 'a)) (acc : 'b) {m; w; h} =
+        let racc = ref acc in 
+        for y = 0 to h - 1 do 
+            for x = 0 to w - 1 do 
+                let (nacc, nv) = f !racc m.(x).(y) in 
+                m.(x).(y) <- nv;
+                racc := nacc
+            done
+        done;
+        {m; w; h}, !racc
+
+    let get_4neigbbours m x y = 
+        [x - 1, y; x, y - 1; x + 1, y; x, y + 1]
+        |> List.filter ~f:(fun (x, y) -> x >= 0 && x < m.w && y >= 0 && y < m.h)
+
+    let get_8neigbbours m x y = 
+        ((max 0 (x - 1), min m.w (x + 2)) --- (max 0 (y - 1), min m.h (y + 2)))
+        |> List.filter ~f:(fun (nx, ny) -> (not (nx = x)) || (not (ny = y)))
+
 end
 
 (* IO *)
@@ -147,6 +175,12 @@ module Comb = struct
                             Some res)))
             ) (0 -- Array.length ar) in
         perm_step ar
+end
+
+module Conv = struct 
+    let intv_of_char v = 
+        Char.to_int v 
+        |> (Fn.flip (-)) (Char.to_int '0')
 end
 
 let to_dec (xs : int list) : int = List.fold ~f:(fun a v -> a * 2 + v) ~init:0 xs

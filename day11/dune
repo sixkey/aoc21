@@ -1,0 +1,3 @@
+(executable
+ (libraries str base stdio kock)
+ (name day11))
