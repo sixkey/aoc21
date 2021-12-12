@@ -67,6 +67,12 @@ module Lst = struct
 
 end 
 
+module KStr = struct 
+    let is_lower str = 
+        String.to_list str
+        |> Lst.all_map (fun x -> Char.is_lowercase x) 
+end
+
 module Matrix = struct
     type 'a t = {m : 'a array array; w : int; h : int } 
 
@@ -115,6 +121,48 @@ module Matrix = struct
         ((max 0 (x - 1), min m.w (x + 2)) --- (max 0 (y - 1), min m.h (y + 2)))
         |> List.filter ~f:(fun (nx, ny) -> (not (nx = x)) || (not (ny = y)))
 
+end
+
+module Graph = struct 
+   
+    module type GraphType = sig 
+        type t 
+        val compare: t -> t -> int
+        val sexp_of_t : t -> Sexp.t
+    end 
+
+    module Make (GT: GraphType) = struct 
+
+        module Comparator = struct 
+            include GT 
+            include Comparator.Make(GT)
+        end 
+
+        type vt = GT.t 
+        type vst = (GT.t, Comparator.comparator_witness) Set.t 
+        type est = (GT.t, GT.t list, Comparator.comparator_witness) Map.t 
+
+        type t = { 
+            vs : vst;
+            es : est
+        }
+
+        let empty = { vs = Set.empty (module Comparator); es = Map.empty (module Comparator) }
+
+        let append_edge es u v = 
+            Map.update es u ~f:(function  
+                | None -> [v]
+                | Some ns -> v :: ns)
+
+        let add_vertex (g : t) (v : vt) = { vs = Set.add g.vs v; es = g.es }
+
+        let add_edge ({vs; es} : t) (u, v : vt * vt) = { 
+            vs = Set.add vs u |> (Fn.flip Set.add) v; 
+            es = 
+                let after_u = append_edge es u v  in 
+                append_edge after_u v u }
+
+    end
 end
 
 (* IO *)
