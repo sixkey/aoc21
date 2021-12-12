@@ -7,6 +7,11 @@ module StringGraph = Graph.Make(struct
     type t = string [@@deriving compare, sexp_of]
 end)
 
+let draw_graph (g : StringGraph.t) = 
+    Map.iter_keys g.es ~f:(fun a -> List.iter (Map.find_exn g.es a) ~f:(
+        fun b -> printf "%s -> %s\n" a b
+    ))
+
 let add_line g l = 
     String.split ~on:'-' l
     |> function 
@@ -27,11 +32,6 @@ let rec dfs (g : StringGraph.t) (visited : StringGraph.vst) (depth : int)
         List.fold 
             ~f:(Fn.flip ((+) % dfs g new_visited (depth + 1) twice_used_new)) 
             ~init:0 (Map.find_exn g.es vertex) 
-
-let draw_graph (g : StringGraph.t) = 
-    Map.iter_keys g.es ~f:(fun a -> List.iter (Map.find_exn g.es a) ~f:(
-        fun b -> printf "%s -> %s\n" a b
-    ))
 
 let part1 filename = 
     In_channel.create filename 
