@@ -1,0 +1,4 @@
+(executable
+ (libraries kock stdio str base)
+ (preprocess (pps ppx_jane))
+ (name day13))

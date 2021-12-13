@@ -10,6 +10,7 @@ let dump _ = ()
 
 let dup x = (x, x)
 let fdup f g x = (f x, g x)
+let use_pass f x = f x; x
 
 (*Function manipulation*)
 
@@ -170,6 +171,17 @@ end
 module IO = struct 
 
     let build_tran tran line_tran acc line = tran acc @@ line_tran line
+
+    let stdin_foldi_while ?(max_lines=(-1)) tran start stdin = 
+        let rec stdin_foldwhile_step acc m i = 
+            if m = 0 then acc, None else match In_channel.input_line stdin with 
+                |   Some line -> 
+                        (match (tran i acc line) with
+                            | Some nacc -> stdin_foldwhile_step nacc (m - 1) (i + 1)
+                            | None -> acc, Some line)
+                |   None -> acc, None 
+        in
+        stdin_foldwhile_step start max_lines 0
 
     let stdin_foldim max_lines tran start stdin = 
         let rec stdin_foldi_step acc m i =   
