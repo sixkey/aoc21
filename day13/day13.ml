@@ -39,9 +39,10 @@ let read_input filename =
 
 type point_set = (PointComparator.t, PointComparator.comparator_witness) Set.t
 
+let fold_1d f x = if x < f then x else (f - x % f) % f
 let get_fold = function 
-    | (Hor, h) -> fun (x, y) -> if x < h then (x, y) else ((h - x % h) % h, y)
-    | (Ver, v) -> fun (x, y) -> if y < v then (x, y) else (x, (v - y % v) % v)
+    | (Hor, h) -> first @@ fold_1d h
+    | (Ver, v) -> second @@ fold_1d v
 
 let apply_fold (point_set : point_set) (fold : direction * int) = 
     Set.map (module PointComparator) ~f:(get_fold fold) point_set
