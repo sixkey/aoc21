@@ -11,6 +11,7 @@ let dump _ = ()
 let dup x = (x, x)
 let fdup f g x = (f x, g x)
 let use_pass f x = f x; x
+let share_pass f x = (x, f x)
 
 (*Function manipulation*)
 
@@ -36,6 +37,10 @@ let (---) ((ax, ay) : int * int) ((bx, by) : int * int) =
 (* Lists *)
 
 module Lst = struct 
+
+    let rec pairs_map f = function 
+        | h::m::tl -> f h m :: pairs_map f (m::tl)
+        | _ -> []
 
     let l_all (lst : bool list) = List.fold lst ~init:true ~f:(&&)
     let all_map (pred : 'a -> bool) (lst : 'a list) = List.fold ~f:(fun acc v -> acc && pred v) ~init:true lst
@@ -78,6 +83,20 @@ module Matrix = struct
     type 'a t = {m : 'a array array; w : int; h : int } 
 
     let make w h v = let m = Array.make_matrix ~dimx:w ~dimy:h v in { m = m ; w = w ; h = h }
+    let make_col h v = make 1 h v
+
+    let ident s = 
+        let mat = make s s 0 in 
+        for i = 0 to s - 1 do
+            mat.m.(i).(i) <- 1
+        done; 
+        mat
+
+    let apply_col f c mat = 
+        for i = 0 to mat.h - 1 do 
+            mat.m.(c).(i) <- f i mat.m.(c).(i)
+        done;
+        mat
 
     let print (prnt) {m; w; h} = 
         for y = 0 to h - 1 do 
@@ -121,6 +140,34 @@ module Matrix = struct
     let get_8neigbbours m x y = 
         ((max 0 (x - 1), min m.w (x + 2)) --- (max 0 (y - 1), min m.h (y + 2)))
         |> List.filter ~f:(fun (nx, ny) -> (not (nx = x)) || (not (ny = y)))
+
+    let mul a b = 
+        if a.w <> b.h then 
+            raise @@ Invalid_argument "the matrix dimenions don't match"
+        else 
+            let res = make b.w a.h 0 in
+            for y = 0 to res.h - 1 do 
+                for x = 0 to res.w - 1 do 
+                    let temp = ref 0 in 
+                    for i = 0 to a.w - 1 do 
+                        temp := !temp + a.m.(i).(y) * b.m.(x).(i)
+                    done;
+                    res.m.(x).(y) <- !temp
+                done
+            done;
+            res
+
+    let add a b = 
+        if a.w <> b.w || a.h <> b.h then 
+            raise @@ Invalid_argument "the matrix don't match"
+        else 
+            let res = make a.w a.h 0 in 
+            for y = 0 to res.h - 1 do 
+                for x = 0 to res.w - 1 do 
+                    res.m.(x).(y) <- a.m.(x).(y) + b.m.(x).(y)
+                done
+            done;
+            res
 
 end
 
