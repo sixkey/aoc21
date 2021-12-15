@@ -7,8 +7,6 @@ let alphabet_size = 26
 
 let letter_of_idx idx = Char.of_int (idx + Char.to_int 'A')
 let idx_of_letter letter = Char.to_int letter - Char.to_int 'A'
-
-
 let idx_of_pair a b = a * alphabet_size + b
 let pair_of_idx idx = (idx / alphabet_size, Base.(%) idx alphabet_size)
 
